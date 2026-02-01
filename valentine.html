@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Will You Be My Valentine?</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital@1&display=swap" rel="stylesheet">
+
+<style>
+* {
+    box-sizing: border-box;
+    font-family: 'Playfair Display', serif;
+}
+
+body {
+    margin: 0;
+    height: 100vh;
+    background: linear-gradient(135deg, #ffd6e8, #ffb6c1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.card {
+    background: white;
+    padding: 50px 60px;
+    border-radius: 25px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+    text-align: center;
+    position: relative;
+    z-index: 2;
+}
+
+h1 {
+    font-size: 38px;
+    margin-bottom: 35px;
+}
+
+.buttons {
+    position: relative;
+    height: 140px;
+}
+
+button {
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 22px;
+    padding: 18px 36px;
+    position: absolute;
+}
+
+#yes {
+    background: #ff2e63;
+    color: white;
+    font-size: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+#no {
+    background: #555;
+    color: white;
+}
+
+/* Emoji rain */
+.emoji {
+    position: fixed;
+    font-size: 36px;
+    pointer-events: none;
+    animation: fall 3.5s linear forwards;
+}
+
+@keyframes fall {
+    from {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateY(100vh);
+        opacity: 0;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+    <h1>Will you be my Valentine? 💌</h1>
+
+    <div class="buttons">
+        <button id="yes">YES ❤️</button>
+        <button id="no">NO 💔</button>
+    </div>
+</div>
+
+<script>
+const noBtn = document.getElementById("no");
+const yesBtn = document.getElementById("yes");
+
+// CONSTANT NO BUTTON CHAOS
+setInterval(() => {
+    const x = Math.random() * (window.innerWidth - 120);
+    const y = Math.random() * (window.innerHeight - 120);
+    noBtn.style.left = x + "px";
+    noBtn.style.top = y + "px";
+}, 700);
+
+// YES = MASSIVE CONFETTI + ROSES
+yesBtn.addEventListener("click", () => {
+    startRain(["🌹","🎉","💖","💐"]);
+});
+
+// NO = MASSIVE CRYING
+noBtn.addEventListener("click", () => {
+    startRain(["😭","💔","🥺"]);
+});
+
+function startRain(emojis) {
+    let count = 0;
+    const rain = setInterval(() => {
+        for (let i = 0; i < 20; i++) {
+            createEmoji(emojis[Math.floor(Math.random() * emojis.length)]);
+        }
+        count++;
+        if (count > 25) clearInterval(rain);
+    }, 120);
+}
+
+function createEmoji(symbol) {
+    const emoji = document.createElement("div");
+    emoji.classList.add("emoji");
+    emoji.innerText = symbol;
+
+    const corners = [
+        { x: 0, y: 0 },
+        { x: window.innerWidth, y: 0 },
+        { x: 0, y: window.innerHeight },
+        { x: window.innerWidth, y: window.innerHeight }
+    ];
+
+    const corner = corners[Math.floor(Math.random() * corners.length)];
+
+    emoji.style.left = corner.x + Math.random() * 100 + "px";
+    emoji.style.top = corner.y + "px";
+
+    document.body.appendChild(emoji);
+
+    setTimeout(() => emoji.remove(), 3500);
+}
+</script>
+
+</body>
+</html>
