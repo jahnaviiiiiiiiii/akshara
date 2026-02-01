@@ -24,37 +24,37 @@ body {
 
 .card {
     background: white;
-    padding: 50px 60px;
-    border-radius: 25px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+    padding: 55px 65px;
+    border-radius: 28px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.3);
     text-align: center;
     position: relative;
-    z-index: 2;
+    z-index: 5;
 }
 
 h1 {
-    font-size: 38px;
-    margin-bottom: 35px;
+    font-size: 40px;
+    margin-bottom: 40px;
 }
 
 .buttons {
     position: relative;
-    height: 140px;
+    height: 160px;
 }
 
 button {
     border: none;
-    border-radius: 50px;
+    border-radius: 60px;
     cursor: pointer;
-    font-size: 22px;
-    padding: 18px 36px;
+    font-size: 24px;
+    padding: 20px 40px;
     position: absolute;
 }
 
 #yes {
     background: #ff2e63;
     color: white;
-    font-size: 28px;
+    font-size: 30px;
     left: 50%;
     transform: translateX(-50%);
 }
@@ -62,32 +62,46 @@ button {
 #no {
     background: #555;
     color: white;
+    transition: transform 0.2s;
 }
 
-/* Emoji rain */
+/* EMOJI STORM */
 .emoji {
     position: fixed;
-    font-size: 36px;
+    font-size: 60px;
     pointer-events: none;
-    animation: fall 3.5s linear forwards;
+    animation-duration: 3.2s;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
 }
 
-@keyframes fall {
-    from {
-        transform: translateY(0);
-        opacity: 1;
-    }
+@keyframes fallDown {
     to {
-        transform: translateY(100vh);
+        transform: translateY(110vh) rotate(720deg);
         opacity: 0;
     }
+}
+
+@keyframes fallUp {
+    to {
+        transform: translateY(-110vh) rotate(-720deg);
+        opacity: 0;
+    }
+}
+
+@keyframes shake {
+    0% { transform: translate(0, 0); }
+    25% { transform: translate(-8px, 6px); }
+    50% { transform: translate(8px, -6px); }
+    75% { transform: translate(-6px, -8px); }
+    100% { transform: translate(0, 0); }
 }
 </style>
 </head>
 
 <body>
 
-<div class="card">
+<div class="card" id="card">
     <h1>Will you be my Valentine? 💌</h1>
 
     <div class="buttons">
@@ -99,34 +113,42 @@ button {
 <script>
 const noBtn = document.getElementById("no");
 const yesBtn = document.getElementById("yes");
+const card = document.getElementById("card");
 
-// CONSTANT NO BUTTON CHAOS
+let noScale = 1;
+
+// NO BUTTON CHAOS (teleport + rotate + shrink)
 setInterval(() => {
     const x = Math.random() * (window.innerWidth - 120);
     const y = Math.random() * (window.innerHeight - 120);
+
+    noScale *= 0.96;
+
     noBtn.style.left = x + "px";
     noBtn.style.top = y + "px";
-}, 700);
+    noBtn.style.transform = `scale(${noScale}) rotate(${Math.random() * 360}deg)`;
+}, 650);
 
-// YES = MASSIVE CONFETTI + ROSES
+// YES = NEVER-ENDING CELEBRATION
 yesBtn.addEventListener("click", () => {
-    startRain(["🌹","🎉","💖","💐"]);
+    setInterval(() => {
+        storm(["🌹","🎉","💖","💐","❤️"]);
+    }, 200);
 });
 
-// NO = MASSIVE CRYING
+// NO = CRYING STORM + SHAKE
 noBtn.addEventListener("click", () => {
-    startRain(["😭","💔","🥺"]);
+    card.style.animation = "shake 0.5s";
+    setTimeout(() => card.style.animation = "", 500);
+
+    storm(["😭","💔","🥺","😢"]);
 });
 
-function startRain(emojis) {
-    let count = 0;
-    const rain = setInterval(() => {
-        for (let i = 0; i < 20; i++) {
-            createEmoji(emojis[Math.floor(Math.random() * emojis.length)]);
-        }
-        count++;
-        if (count > 25) clearInterval(rain);
-    }, 120);
+// EMOJI STORM FUNCTION
+function storm(emojis) {
+    for (let i = 0; i < 50; i++) {
+        createEmoji(emojis[Math.floor(Math.random() * emojis.length)]);
+    }
 }
 
 function createEmoji(symbol) {
@@ -134,21 +156,35 @@ function createEmoji(symbol) {
     emoji.classList.add("emoji");
     emoji.innerText = symbol;
 
-    const corners = [
-        { x: 0, y: 0 },
-        { x: window.innerWidth, y: 0 },
-        { x: 0, y: window.innerHeight },
-        { x: window.innerWidth, y: window.innerHeight }
-    ];
+    const corner = Math.floor(Math.random() * 4);
 
-    const corner = corners[Math.floor(Math.random() * corners.length)];
+    if (corner === 0) {
+        emoji.style.left = "0px";
+        emoji.style.top = "0px";
+        emoji.style.animationName = "fallDown";
+    }
 
-    emoji.style.left = corner.x + Math.random() * 100 + "px";
-    emoji.style.top = corner.y + "px";
+    if (corner === 1) {
+        emoji.style.right = "0px";
+        emoji.style.top = "0px";
+        emoji.style.animationName = "fallDown";
+    }
+
+    if (corner === 2) {
+        emoji.style.left = "0px";
+        emoji.style.bottom = "0px";
+        emoji.style.animationName = "fallUp";
+    }
+
+    if (corner === 3) {
+        emoji.style.right = "0px";
+        emoji.style.bottom = "0px";
+        emoji.style.animationName = "fallUp";
+    }
 
     document.body.appendChild(emoji);
 
-    setTimeout(() => emoji.remove(), 3500);
+    setTimeout(() => emoji.remove(), 3200);
 }
 </script>
 
