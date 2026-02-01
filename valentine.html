@@ -54,7 +54,6 @@ button {
 #yes {
     background: #ff2e63;
     color: white;
-    font-size: 30px;
     left: 50%;
     transform: translateX(-50%);
 }
@@ -62,7 +61,6 @@ button {
 #no {
     background: #555;
     color: white;
-    transition: transform 0.2s;
 }
 
 /* EMOJI STORM */
@@ -70,38 +68,37 @@ button {
     position: fixed;
     font-size: 60px;
     pointer-events: none;
-    animation-duration: 3.2s;
+    animation-duration: 3.5s;
     animation-timing-function: linear;
     animation-fill-mode: forwards;
 }
 
 @keyframes fallDown {
-    to {
-        transform: translateY(110vh) rotate(720deg);
-        opacity: 0;
-    }
+    to { transform: translateY(120vh) rotate(720deg); opacity: 0; }
 }
 
 @keyframes fallUp {
-    to {
-        transform: translateY(-110vh) rotate(-720deg);
-        opacity: 0;
-    }
+    to { transform: translateY(-120vh) rotate(-720deg); opacity: 0; }
 }
 
-@keyframes shake {
-    0% { transform: translate(0, 0); }
-    25% { transform: translate(-8px, 6px); }
-    50% { transform: translate(8px, -6px); }
-    75% { transform: translate(-6px, -8px); }
-    100% { transform: translate(0, 0); }
+@keyframes fallRight {
+    to { transform: translateX(120vw) rotate(720deg); opacity: 0; }
+}
+
+@keyframes fallLeft {
+    to { transform: translateX(-120vw) rotate(-720deg); opacity: 0; }
 }
 </style>
 </head>
 
 <body>
 
-<div class="card" id="card">
+<!-- 🎵 Romantic Music -->
+<audio id="music" autoplay loop muted>
+    <source src="https://cdn.pixabay.com/audio/2022/10/30/audio_8c6b89e6df.mp3" type="audio/mpeg">
+</audio>
+
+<div class="card">
     <h1>Will you be my Valentine? 💌</h1>
 
     <div class="buttons">
@@ -111,80 +108,78 @@ button {
 </div>
 
 <script>
-const noBtn = document.getElementById("no");
 const yesBtn = document.getElementById("yes");
-const card = document.getElementById("card");
+const noBtn = document.getElementById("no");
+const music = document.getElementById("music");
 
-let noScale = 1;
+// 🔊 Unmute music on first interaction (browser rule)
+document.body.addEventListener("click", () => {
+    music.muted = false;
+}, { once: true });
 
-// NO BUTTON CHAOS (teleport + rotate + shrink)
+// ❤️ YES BUTTON GROWS EVERY SECOND
+let yesScale = 1;
 setInterval(() => {
-    const x = Math.random() * (window.innerWidth - 120);
-    const y = Math.random() * (window.innerHeight - 120);
+    yesScale += 0.05;
+    yesBtn.style.transform = `translateX(-50%) scale(${yesScale})`;
+}, 1000);
 
-    noScale *= 0.96;
+// 😈 NO BUTTON TELEPORTS
+setInterval(() => {
+    noBtn.style.left = Math.random() * (window.innerWidth - 120) + "px";
+    noBtn.style.top = Math.random() * (window.innerHeight - 120) + "px";
+}, 700);
 
-    noBtn.style.left = x + "px";
-    noBtn.style.top = y + "px";
-    noBtn.style.transform = `scale(${noScale}) rotate(${Math.random() * 360}deg)`;
-}, 650);
-
-// YES = NEVER-ENDING CELEBRATION
+// YES = PERMANENT LOVE STORM
 yesBtn.addEventListener("click", () => {
-    setInterval(() => {
-        storm(["🌹","🎉","💖","💐","❤️"]);
-    }, 200);
+    setInterval(() => emojiStorm(["🌹","💖","💐","🎉","❤️"]), 150);
 });
 
-// NO = CRYING STORM + SHAKE
+// NO = SAD STORM
 noBtn.addEventListener("click", () => {
-    card.style.animation = "shake 0.5s";
-    setTimeout(() => card.style.animation = "", 500);
-
-    storm(["😭","💔","🥺","😢"]);
+    emojiStorm(["😭","💔","🥺","😢"]);
 });
 
-// EMOJI STORM FUNCTION
-function storm(emojis) {
-    for (let i = 0; i < 50; i++) {
-        createEmoji(emojis[Math.floor(Math.random() * emojis.length)]);
+// 🌪️ TRUE SCREEN BOMBARDMENT
+function emojiStorm(emojis) {
+    for (let i = 0; i < 60; i++) {
+        spawnEmoji(emojis[Math.floor(Math.random() * emojis.length)]);
     }
 }
 
-function createEmoji(symbol) {
+function spawnEmoji(symbol) {
     const emoji = document.createElement("div");
     emoji.classList.add("emoji");
     emoji.innerText = symbol;
 
-    const corner = Math.floor(Math.random() * 4);
+    const side = Math.floor(Math.random() * 4);
 
-    if (corner === 0) {
-        emoji.style.left = "0px";
+    if (side === 0) { // TOP
         emoji.style.top = "0px";
+        emoji.style.left = Math.random() * window.innerWidth + "px";
         emoji.style.animationName = "fallDown";
     }
 
-    if (corner === 1) {
-        emoji.style.right = "0px";
-        emoji.style.top = "0px";
-        emoji.style.animationName = "fallDown";
+    if (side === 1) { // BOTTOM
+        emoji.style.bottom = "0px";
+        emoji.style.left = Math.random() * window.innerWidth + "px";
+        emoji.style.animationName = "fallUp";
     }
 
-    if (corner === 2) {
+    if (side === 2) { // LEFT
         emoji.style.left = "0px";
-        emoji.style.bottom = "0px";
-        emoji.style.animationName = "fallUp";
+        emoji.style.top = Math.random() * window.innerHeight + "px";
+        emoji.style.animationName = "fallRight";
     }
 
-    if (corner === 3) {
+    if (side === 3) { // RIGHT
         emoji.style.right = "0px";
-        emoji.style.bottom = "0px";
-        emoji.style.animationName = "fallUp";
+        emoji.style.top = Math.random() * window.innerHeight + "px";
+        emoji.style.animationName = "fallLeft";
     }
 
     document.body.appendChild(emoji);
-
-    setTimeout(() => emoji.remove(), 3200);
+    setTimeout(() => emoji.remove(), 3500);
 }
 </script>
 
